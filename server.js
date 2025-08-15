@@ -1,21 +1,17 @@
 const express = require('express');
 const cors = require('cors');
-const app = express();
-
-// Use the port Render provides, fallback to 3000
-const PORT = process.env.PORT || 3000;
-
 const path = require('path');
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
+const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
+// Serve frontend files from "public"
+app.use(express.static(path.join(__dirname, 'public')));
+
+// API routes
 let items = [
   { id: 1, name: 'Apple', price: 1.2 },
   { id: 2, name: 'Banana', price: 0.8 },
@@ -29,7 +25,9 @@ app.post('/api/items', (req, res) => {
   res.status(201).json(newItem);
 });
 
-// Root route for sanity check
-app.get('/', (req, res) => res.send('Backend running!'));
+// Catch-all route to serve index.html for frontend
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
