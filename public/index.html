@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Shop</title>
+</head>
+<body>
+  <h1>Items</h1>
+  <ul id="items-list"></ul>
+
+  <h2>Add Item</h2>
+  <input id="name" placeholder="Name">
+  <input id="price" placeholder="Price" type="number" step="0.01">
+  <button id="add-btn">Add Item</button>
+
+  <script>
+    const apiURL = 'http://localhost:3000/api/items';
+
+    // Load items
+    async function loadItems() {
+      const res = await fetch(apiURL);
+      const items = await res.json();
+      const list = document.getElementById('items-list');
+      list.innerHTML = '';
+      items.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+        list.appendChild(li);
+      });
+    }
+
+    // Add item
+    document.getElementById('add-btn').addEventListener('click', async () => {
+      const name = document.getElementById('name').value;
+      const price = parseFloat(document.getElementById('price').value);
+      if (!name || isNaN(price)) return alert('Enter valid name and price');
+
+      await fetch(apiURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, price })
+      });
+
+      document.getElementById('name').value = '';
+      document.getElementById('price').value = '';
+      loadItems();
+    });
+
+    loadItems();
+  </script>
+</body>
+</html>
